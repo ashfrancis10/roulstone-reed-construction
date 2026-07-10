@@ -262,7 +262,7 @@
   function updateServerBanner() {
     if (!serverBanner) return;
     if (serverAvailable) {
-      serverBanner.textContent = 'Server connected — Save and image upload are enabled.';
+      serverBanner.textContent = 'Server connected — Save publishes to GitHub automatically.';
       serverBanner.className = 'server-banner ok';
     } else {
       serverBanner.textContent = 'Local server not detected. Run start.bat, then refresh. You can still edit and use Download JSON.';
@@ -391,7 +391,15 @@
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || 'Save failed');
       content = data;
-      setStatus('Saved. Refresh the main site to see changes.', 'ok');
+      if (body.published) {
+        setStatus('Saved and published to GitHub. Live site will update shortly.', 'ok');
+      } else if (body.publishError) {
+        setStatus('Saved locally. GitHub publish failed: ' + body.publishError, 'err');
+      } else if (body.message) {
+        setStatus(body.message + '. Refresh the main site to see changes.', 'ok');
+      } else {
+        setStatus('Saved. Refresh the main site to see changes.', 'ok');
+      }
     } catch (err) {
       setStatus(err.message || 'Could not save. Run start.bat and try again.', 'err');
     }

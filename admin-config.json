@@ -1,3 +1,4 @@
 {
-  "password": "password"
+  "password": "password",
+  "publishToGitHub": true
 }

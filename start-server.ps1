@@ -7,15 +7,50 @@ Write-Host "Roulstone Reed site running at http://localhost:$port"
 Write-Host "Edit content at http://localhost:$port/admin.html"
 Write-Host "Press Ctrl+C to stop."
 
-function Get-AdminPassword {
-  $default = "password"
+function Get-AdminConfig {
   $cfgPath = Join-Path $root "admin-config.json"
+  $default = @{ password = "password"; publishToGitHub = $true }
   if (Test-Path $cfgPath) {
     $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json
-    $pw = [string]$cfg.password
-    if ($pw.Trim()) { return $pw.Trim() }
+    return @{
+      password = if ([string]$cfg.password) { $cfg.password.Trim() } else { $default.password }
+      publishToGitHub = if ($null -ne $cfg.publishToGitHub) { [bool]$cfg.publishToGitHub } else { $true }
+    }
   }
   return $default
+}
+
+function Get-AdminPassword {
+  return (Get-AdminConfig).password
+}
+
+function Get-GitExe {
+  $git = Join-Path $env:LOCALAPPDATA "Programs\Git\cmd\git.exe"
+  if (Test-Path $git) { return $git }
+  return "git"
+}
+
+function Publish-ToGitHub {
+  $git = Get-GitExe
+  Push-Location $root
+  try {
+    & $git add content.json 2>&1 | Out-Null
+    if (Test-Path (Join-Path $root "images")) {
+      & $git add images/ 2>&1 | Out-Null
+    }
+    $changes = & $git status --porcelain content.json images/
+    if (-not $changes) {
+      return @{ published = $false; message = "No GitHub changes to publish" }
+    }
+    $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
+    & $git commit -m "Update site content from editor ($stamp)" 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Git commit failed" }
+    $push = & $git push origin main 2>&1
+    if ($LASTEXITCODE -ne 0) { throw ($push -join " ") }
+    return @{ published = $true; message = "Published to GitHub" }
+  } finally {
+    Pop-Location
+  }
 }
 
 function Send-Json($context, $obj, $code) {
@@ -57,7 +92,23 @@ while ($listener.IsListening) {
       $formatted = $parsed | ConvertTo-Json -Depth 20
       $outPath = Join-Path $root "content.json"
       [System.IO.File]::WriteAllText($outPath, $formatted, [System.Text.UTF8Encoding]::new($false))
-      Send-Json $context @{ ok = $true } 200
+      $response = @{ ok = $true; saved = $true }
+      $cfg = Get-AdminConfig
+      if ($cfg.publishToGitHub) {
+        try {
+          $pub = Publish-ToGitHub
+          $response.published = [bool]$pub.published
+          $response.message = $pub.message
+        } catch {
+          $response.published = $false
+          $response.publishError = $_.Exception.Message
+          $response.message = "Saved locally, but GitHub publish failed"
+        }
+      } else {
+        $response.published = $false
+        $response.message = "Saved locally"
+      }
+      Send-Json $context $response 200
     } catch {
       Send-Json $context @{ error = $_.Exception.Message } 500
     }
