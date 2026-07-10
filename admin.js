@@ -1,6 +1,8 @@
 (function () {
   const AUTH_KEY = 'rr_admin_auth';
   const DEFAULT_PASSWORD = 'password';
+  const DEFAULT_LIVE_URL = 'https://ashfrancis10.github.io/roulstone-reed-construction/';
+  let liveSiteUrl = DEFAULT_LIVE_URL;
   let content = null;
   let adminPassword = DEFAULT_PASSWORD;
   let configReady = false;
@@ -286,6 +288,7 @@
       if (!res.ok) throw new Error('Could not load admin config');
       const cfg = await res.json();
       adminPassword = String(cfg.password || DEFAULT_PASSWORD).trim() || DEFAULT_PASSWORD;
+      liveSiteUrl = String(cfg.liveSiteUrl || DEFAULT_LIVE_URL).trim() || DEFAULT_LIVE_URL;
     } catch {
       adminPassword = DEFAULT_PASSWORD;
     }
@@ -392,7 +395,7 @@
       if (!res.ok) throw new Error(body.error || 'Save failed');
       content = data;
       if (body.published) {
-        setStatus('Saved and published to GitHub. Live site will update shortly.', 'ok');
+        setStatus('Saved and published. Live site updates in 1–2 minutes: ' + liveSiteUrl, 'ok');
       } else if (body.publishError) {
         setStatus('Saved locally. GitHub publish failed: ' + body.publishError, 'err');
       } else if (body.message) {
