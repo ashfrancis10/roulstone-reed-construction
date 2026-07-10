@@ -8,12 +8,14 @@ Write-Host "Edit content at http://localhost:$port/admin.html"
 Write-Host "Press Ctrl+C to stop."
 
 function Get-AdminPassword {
+  $default = "password"
   $cfgPath = Join-Path $root "admin-config.json"
   if (Test-Path $cfgPath) {
     $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json
-    return $cfg.password
+    $pw = [string]$cfg.password
+    if ($pw.Trim()) { return $pw.Trim() }
   }
-  return ""
+  return $default
 }
 
 function Send-Json($context, $obj, $code) {

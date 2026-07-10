@@ -1,13 +1,16 @@
 (function () {
   const AUTH_KEY = 'rr_admin_auth';
+  const DEFAULT_PASSWORD = 'password';
   let content = null;
-  let adminPassword = '';
+  let adminPassword = DEFAULT_PASSWORD;
+  let configReady = false;
   let serverAvailable = false;
 
   const loginScreen = document.getElementById('login-screen');
   const editor = document.getElementById('editor');
   const loginForm = document.getElementById('login-form');
   const loginError = document.getElementById('login-error');
+  const loginBtn = document.getElementById('btn-login');
   const contentForm = document.getElementById('content-form');
   const saveStatus = document.getElementById('save-status');
   const serverBanner = document.getElementById('server-banner');
@@ -278,10 +281,19 @@
   }
 
   async function loadConfig() {
-    const res = await fetch('admin-config.json?' + Date.now());
-    if (!res.ok) throw new Error('Could not load admin config');
-    const cfg = await res.json();
-    adminPassword = cfg.password || '';
+    try {
+      const res = await fetch('admin-config.json?' + Date.now());
+      if (!res.ok) throw new Error('Could not load admin config');
+      const cfg = await res.json();
+      adminPassword = String(cfg.password || DEFAULT_PASSWORD).trim() || DEFAULT_PASSWORD;
+    } catch {
+      adminPassword = DEFAULT_PASSWORD;
+    }
+    configReady = true;
+    if (loginBtn) {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign in';
+    }
   }
 
   async function loadContent() {
@@ -314,9 +326,10 @@
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const pw = document.getElementById('login-password').value;
+    if (!configReady) await loadConfig();
+    const pw = document.getElementById('login-password').value.trim();
     if (pw !== adminPassword) {
-      loginError.textContent = 'Incorrect password';
+      loginError.textContent = 'Incorrect password. Use: password';
       loginError.hidden = false;
       return;
     }
@@ -385,16 +398,14 @@
   });
 
   async function init() {
-    try {
-      await loadConfig();
-    } catch {
-      loginError.textContent = 'Open via http://localhost:8080/admin.html (run start.bat first).';
-      loginError.hidden = false;
-      return;
+    if (loginBtn) {
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Loading…';
     }
+    await loadConfig();
 
     const stored = sessionStorage.getItem(AUTH_KEY);
-    if (stored && stored === adminPassword) {
+    if (stored && stored.trim() === adminPassword) {
       await enterEditor();
     } else if (stored) {
       sessionStorage.removeItem(AUTH_KEY);
