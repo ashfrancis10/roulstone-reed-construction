@@ -179,16 +179,6 @@
   if (storyNext) storyNext.addEventListener('click', () => showStory(storyIndex + 1));
   showStory(0);
 
-  /* ── Instagram embeds ── */
-  function refreshInstagramEmbeds() {
-    if (window.instgrm && window.instgrm.Embeds) {
-      window.instgrm.Embeds.process();
-    }
-  }
-
-  refreshInstagramEmbeds();
-  window.addEventListener('load', refreshInstagramEmbeds);
-
   /* ── Anchor links ── */
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (e) => {
