@@ -78,6 +78,9 @@ textarea { min-height: 5rem; resize: vertical; }
 
 .btn-dark { background: var(--black); color: var(--white); }
 .btn-ghost { background: transparent; border: 1px solid var(--border); }
+.btn-exit { background: transparent; border: 1px solid var(--border); }
+
+.login-exit { margin-top: 0.25rem; }
 
 .error { color: #c0392b; font-size: 0.85rem; }
 
