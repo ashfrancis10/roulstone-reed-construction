@@ -289,6 +289,8 @@
       const cfg = await res.json();
       adminPassword = String(cfg.password || DEFAULT_PASSWORD).trim() || DEFAULT_PASSWORD;
       liveSiteUrl = String(cfg.liveSiteUrl || DEFAULT_LIVE_URL).trim() || DEFAULT_LIVE_URL;
+      const liveBtn = document.getElementById('btn-live-site');
+      if (liveBtn) liveBtn.href = liveSiteUrl;
     } catch {
       adminPassword = DEFAULT_PASSWORD;
     }

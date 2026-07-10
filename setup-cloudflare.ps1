@@ -9,6 +9,11 @@ if (-not (Test-Path $gh)) { $gh = "gh" }
 Write-Host "Cloudflare Workers deploy setup"
 Write-Host "Live site: https://roulstone-reed-construction.ashfrancis10.workers.dev/"
 Write-Host ""
+Write-Host "Get your credentials from the Cloudflare dashboard:"
+Write-Host "  1. Log in at https://dash.cloudflare.com"
+Write-Host "  2. Account ID: shown in the right sidebar on the Workers page"
+Write-Host "  3. API token: Profile > API Tokens > Create Token > Edit Cloudflare Workers"
+Write-Host ""
 
 if (-not $ApiToken) {
   $ApiToken = Read-Host "Paste your Cloudflare API token"
