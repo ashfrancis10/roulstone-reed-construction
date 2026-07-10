@@ -2,6 +2,7 @@
   const AUTH_KEY = 'rr_admin_auth';
   let content = null;
   let adminPassword = '';
+  let serverAvailable = false;
 
   const loginScreen = document.getElementById('login-screen');
   const editor = document.getElementById('editor');
@@ -9,6 +10,7 @@
   const loginError = document.getElementById('login-error');
   const contentForm = document.getElementById('content-form');
   const saveStatus = document.getElementById('save-status');
+  const serverBanner = document.getElementById('server-banner');
 
   function getAuthHeader() {
     return { 'X-Admin-Password': sessionStorage.getItem(AUTH_KEY) || '' };
@@ -45,17 +47,24 @@
     lbl.htmlFor = id;
     lbl.textContent = label;
     wrap.appendChild(lbl);
+
     const preview = document.createElement('img');
     preview.className = 'preview';
-    preview.src = value || '';
     preview.alt = '';
+    preview.onerror = () => { preview.classList.add('preview-broken'); };
+    if (value) preview.src = value;
+
     const urlInput = document.createElement('input');
-    urlInput.type = 'url';
+    urlInput.type = 'text';
     urlInput.id = id;
     urlInput.name = id;
     urlInput.value = value || '';
     urlInput.placeholder = 'Image URL or upload below';
-    urlInput.addEventListener('input', () => { preview.src = urlInput.value; });
+    urlInput.addEventListener('input', () => {
+      preview.classList.remove('preview-broken');
+      preview.src = urlInput.value;
+    });
+
     const uploadRow = document.createElement('div');
     uploadRow.className = 'upload-row';
     const fileInput = document.createElement('input');
@@ -64,6 +73,10 @@
     fileInput.addEventListener('change', async () => {
       const file = fileInput.files[0];
       if (!file) return;
+      if (!serverAvailable) {
+        setStatus('Start start.bat before uploading images.', 'err');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = async () => {
         try {
@@ -75,13 +88,14 @@
               data: reader.result.split(',')[1],
             }),
           });
-          if (!res.ok) throw new Error('Upload failed');
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || 'Upload failed');
           urlInput.value = data.path;
+          preview.classList.remove('preview-broken');
           preview.src = data.path;
           setStatus('Image uploaded.', 'ok');
-        } catch {
-          setStatus('Upload failed. Is the local server running?', 'err');
+        } catch (err) {
+          setStatus(err.message || 'Upload failed. Run start.bat and try again.', 'err');
         }
       };
       reader.readAsDataURL(file);
@@ -105,35 +119,36 @@
   function buildForm() {
     contentForm.innerHTML = '';
     const c = content;
+    if (!c) return;
 
     const sMeta = section('Site');
-    sMeta.appendChild(field('Page title', 'meta.title', c.meta.title));
-    sMeta.appendChild(field('Meta description', 'meta.description', c.meta.description, 'textarea'));
+    sMeta.appendChild(field('Page title', 'meta.title', c.meta?.title));
+    sMeta.appendChild(field('Meta description', 'meta.description', c.meta?.description, 'textarea'));
     contentForm.appendChild(sMeta);
 
     const sHero = section('Hero');
-    sHero.appendChild(field('Headline', 'hero.title', c.hero.title));
-    sHero.appendChild(field('Kicker', 'hero.kicker', c.hero.kicker));
-    sHero.appendChild(field('Tagline', 'hero.tagline', c.hero.tagline, 'textarea'));
-    sHero.appendChild(imageField('Background image', 'hero.image', c.hero.image));
+    sHero.appendChild(field('Headline', 'hero.title', c.hero?.title));
+    sHero.appendChild(field('Kicker', 'hero.kicker', c.hero?.kicker));
+    sHero.appendChild(field('Tagline', 'hero.tagline', c.hero?.tagline, 'textarea'));
+    sHero.appendChild(imageField('Background image', 'hero.image', c.hero?.image));
     contentForm.appendChild(sHero);
 
     const sHeroImg = section('Hero image');
-    sHeroImg.appendChild(imageField('Image', 'heroImage.src', c.heroImage.src));
-    sHeroImg.appendChild(field('Alt text', 'heroImage.alt', c.heroImage.alt));
+    sHeroImg.appendChild(imageField('Image', 'heroImage.src', c.heroImage?.src));
+    sHeroImg.appendChild(field('Alt text', 'heroImage.alt', c.heroImage?.alt));
     contentForm.appendChild(sHeroImg);
 
     const sAbout = section('About');
-    sAbout.appendChild(field('Heading', 'about.title', c.about.title));
-    sAbout.appendChild(field('Text', 'about.text', c.about.text, 'textarea'));
-    sAbout.appendChild(field('Button', 'about.button', c.about.button));
+    sAbout.appendChild(field('Heading', 'about.title', c.about?.title));
+    sAbout.appendChild(field('Text', 'about.text', c.about?.text, 'textarea'));
+    sAbout.appendChild(field('Button', 'about.button', c.about?.button));
     contentForm.appendChild(sAbout);
 
     const sServices = section('Services');
-    sServices.appendChild(field('Kicker', 'services.kicker', c.services.kicker));
-    sServices.appendChild(field('Text', 'services.text', c.services.text, 'textarea'));
-    sServices.appendChild(field('Button', 'services.button', c.services.button));
-    c.services.items.forEach((item, i) => {
+    sServices.appendChild(field('Kicker', 'services.kicker', c.services?.kicker));
+    sServices.appendChild(field('Text', 'services.text', c.services?.text, 'textarea'));
+    sServices.appendChild(field('Button', 'services.button', c.services?.button));
+    (c.services?.items || []).forEach((item, i) => {
       const sub = document.createElement('div');
       sub.className = 'subsection';
       const h3 = document.createElement('h3');
@@ -146,18 +161,18 @@
     contentForm.appendChild(sServices);
 
     const sShow = section('Our approach');
-    sShow.appendChild(field('Kicker', 'showroom.kicker', c.showroom.kicker));
-    sShow.appendChild(field('Title', 'showroom.title', c.showroom.title, 'textarea'));
-    sShow.appendChild(field('Address label', 'showroom.addressLabel', c.showroom.addressLabel));
-    sShow.appendChild(field('Address', 'showroom.address', c.showroom.address));
-    sShow.appendChild(imageField('Background image', 'showroom.image', c.showroom.image));
+    sShow.appendChild(field('Kicker', 'showroom.kicker', c.showroom?.kicker));
+    sShow.appendChild(field('Title', 'showroom.title', c.showroom?.title, 'textarea'));
+    sShow.appendChild(field('Address label', 'showroom.addressLabel', c.showroom?.addressLabel));
+    sShow.appendChild(field('Address', 'showroom.address', c.showroom?.address));
+    sShow.appendChild(imageField('Background image', 'showroom.image', c.showroom?.image));
     contentForm.appendChild(sShow);
 
     const sProj = section('Projects');
-    sProj.appendChild(field('Kicker', 'projects.kicker', c.projects.kicker));
+    sProj.appendChild(field('Kicker', 'projects.kicker', c.projects?.kicker));
     sProj.appendChild(field('Intro', 'projects.intro', c.projects.intro, 'textarea'));
-    sProj.appendChild(field('Button', 'projects.button', c.projects.button));
-    c.projects.items.forEach((item, i) => {
+    sProj.appendChild(field('Button', 'projects.button', c.projects?.button));
+    (c.projects?.items || []).forEach((item, i) => {
       const sub = document.createElement('div');
       sub.className = 'subsection';
       const h3 = document.createElement('h3');
@@ -171,13 +186,13 @@
     contentForm.appendChild(sProj);
 
     const sDuo = section('Gallery duo');
-    sDuo.appendChild(imageField('Image left', 'duo.imageA', c.duo.imageA));
-    sDuo.appendChild(imageField('Image right', 'duo.imageB', c.duo.imageB));
+    sDuo.appendChild(imageField('Image left', 'duo.imageA', c.duo?.imageA));
+    sDuo.appendChild(imageField('Image right', 'duo.imageB', c.duo?.imageB));
     contentForm.appendChild(sDuo);
 
     const sStories = section('Client stories');
-    sStories.appendChild(field('Kicker', 'stories.kicker', c.stories.kicker));
-    c.stories.items.forEach((item, i) => {
+    sStories.appendChild(field('Kicker', 'stories.kicker', c.stories?.kicker));
+    (c.stories?.items || []).forEach((item, i) => {
       const sub = document.createElement('div');
       sub.className = 'subsection';
       const h3 = document.createElement('h3');
@@ -192,17 +207,17 @@
     contentForm.appendChild(sStories);
 
     const sContact = section('Contact');
-    sContact.appendChild(field('Heading', 'contact.title', c.contact.title));
-    sContact.appendChild(field('Text', 'contact.text', c.contact.text, 'textarea'));
-    sContact.appendChild(field('Primary button', 'contact.buttonPrimary', c.contact.buttonPrimary));
-    sContact.appendChild(field('Secondary button', 'contact.buttonSecondary', c.contact.buttonSecondary));
-    sContact.appendChild(field('Email', 'contact.email', c.contact.email));
+    sContact.appendChild(field('Heading', 'contact.title', c.contact?.title));
+    sContact.appendChild(field('Text', 'contact.text', c.contact?.text, 'textarea'));
+    sContact.appendChild(field('Primary button', 'contact.buttonPrimary', c.contact?.buttonPrimary));
+    sContact.appendChild(field('Secondary button', 'contact.buttonSecondary', c.contact?.buttonSecondary));
+    sContact.appendChild(field('Email', 'contact.email', c.contact?.email));
     contentForm.appendChild(sContact);
 
     const sFooter = section('Footer');
-    sFooter.appendChild(field('Copyright', 'footer.copyright', c.footer.copyright));
-    sFooter.appendChild(field('Instagram URL', 'footer.instagramUrl', c.footer.instagramUrl));
-    sFooter.appendChild(field('Instagram label', 'footer.instagramLabel', c.footer.instagramLabel));
+    sFooter.appendChild(field('Copyright', 'footer.copyright', c.footer?.copyright));
+    sFooter.appendChild(field('Instagram URL', 'footer.instagramUrl', c.footer?.instagramUrl));
+    sFooter.appendChild(field('Instagram label', 'footer.instagramLabel', c.footer?.instagramLabel));
     contentForm.appendChild(sFooter);
   }
 
@@ -224,8 +239,7 @@
         cur = cur[k];
       }
     }
-    const last = keys[keys.length - 1];
-    cur[last] = value;
+    cur[keys[keys.length - 1]] = value;
   }
 
   function collectFormData() {
@@ -242,15 +256,40 @@
     saveStatus.className = 'save-status ' + (type || '');
   }
 
+  function updateServerBanner() {
+    if (!serverBanner) return;
+    if (serverAvailable) {
+      serverBanner.textContent = 'Server connected — Save and image upload are enabled.';
+      serverBanner.className = 'server-banner ok';
+    } else {
+      serverBanner.textContent = 'Local server not detected. Run start.bat, then refresh. You can still edit and use Download JSON.';
+      serverBanner.className = 'server-banner warn';
+    }
+  }
+
+  async function checkServer() {
+    try {
+      const res = await fetch('/api/health', { method: 'GET' });
+      serverAvailable = res.ok;
+    } catch {
+      serverAvailable = false;
+    }
+    updateServerBanner();
+  }
+
   async function loadConfig() {
-    const res = await fetch('admin-config.json');
+    const res = await fetch('admin-config.json?' + Date.now());
+    if (!res.ok) throw new Error('Could not load admin config');
     const cfg = await res.json();
-    adminPassword = cfg.password;
+    adminPassword = cfg.password || '';
   }
 
   async function loadContent() {
     const res = await fetch('content.json?' + Date.now());
-    content = await res.json();
+    if (!res.ok) throw new Error('Could not load content.json');
+    const data = await res.json();
+    if (!data || !data.meta) throw new Error('content.json is invalid');
+    content = data;
   }
 
   function showEditor() {
@@ -259,17 +298,34 @@
     buildForm();
   }
 
-  loginForm.addEventListener('submit', (e) => {
+  async function enterEditor() {
+    try {
+      setStatus('Loading content…', '');
+      await loadContent();
+      await checkServer();
+      showEditor();
+      setStatus('', '');
+    } catch {
+      loginError.textContent = 'Could not load content. Run start.bat, then open http://localhost:8080/admin.html';
+      loginError.hidden = false;
+      sessionStorage.removeItem(AUTH_KEY);
+    }
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const pw = document.getElementById('login-password').value;
-    if (pw === adminPassword) {
-      sessionStorage.setItem(AUTH_KEY, pw);
-      loginError.hidden = true;
-      showEditor();
-    } else {
+    if (pw !== adminPassword) {
+      loginError.textContent = 'Incorrect password';
       loginError.hidden = false;
+      return;
     }
+    sessionStorage.setItem(AUTH_KEY, pw);
+    loginError.hidden = true;
+    await enterEditor();
   });
+
+  contentForm.addEventListener('submit', (e) => e.preventDefault());
 
   document.getElementById('btn-logout').addEventListener('click', () => {
     sessionStorage.removeItem(AUTH_KEY);
@@ -283,31 +339,65 @@
     a.href = URL.createObjectURL(blob);
     a.download = 'content.json';
     a.click();
-    setStatus('Downloaded content.json', 'ok');
+    setStatus('Downloaded content.json — replace the file in the project folder if not using start.bat.', 'ok');
+  });
+
+  document.getElementById('btn-import').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json,.json';
+    input.addEventListener('change', async () => {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (!data.meta) throw new Error('Invalid content file');
+        content = data;
+        buildForm();
+        setStatus('Content imported. Click Save changes to apply.', 'ok');
+      } catch {
+        setStatus('Could not read that file. Choose a valid content.json.', 'err');
+      }
+    });
+    input.click();
   });
 
   document.getElementById('btn-save').addEventListener('click', async () => {
     const data = collectFormData();
     setStatus('Saving…', '');
+    if (!serverAvailable) {
+      setStatus('Start start.bat to save, or use Download JSON.', 'err');
+      return;
+    }
     try {
       const res = await fetch('/api/content', {
         method: 'POST',
         headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data, null, 2),
       });
-      if (!res.ok) throw new Error('Save failed');
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Save failed');
       content = data;
       setStatus('Saved. Refresh the main site to see changes.', 'ok');
-    } catch {
-      setStatus('Could not save. Run start.bat, then try again. Or use Download JSON.', 'err');
+    } catch (err) {
+      setStatus(err.message || 'Could not save. Run start.bat and try again.', 'err');
     }
   });
 
   async function init() {
-    await loadConfig();
-    if (sessionStorage.getItem(AUTH_KEY) === adminPassword) {
-      await loadContent();
-      showEditor();
+    try {
+      await loadConfig();
+    } catch {
+      loginError.textContent = 'Open via http://localhost:8080/admin.html (run start.bat first).';
+      loginError.hidden = false;
+      return;
+    }
+
+    const stored = sessionStorage.getItem(AUTH_KEY);
+    if (stored && stored === adminPassword) {
+      await enterEditor();
+    } else if (stored) {
+      sessionStorage.removeItem(AUTH_KEY);
     }
   }
 

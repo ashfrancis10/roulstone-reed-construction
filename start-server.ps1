@@ -37,6 +37,11 @@ while ($listener.IsListening) {
 
   if ($path -eq "/") { $path = "/index.html" }
 
+  if ($path -eq "/api/health" -and $method -eq "GET") {
+    Send-Json $context @{ ok = $true; editor = $true } 200
+    continue
+  }
+
   if ($path -eq "/api/content" -and $method -eq "POST") {
     $pw = $context.Request.Headers["X-Admin-Password"]
     if ($pw -ne (Get-AdminPassword)) {
@@ -45,8 +50,11 @@ while ($listener.IsListening) {
     }
     try {
       $body = Read-Body $context
+      $parsed = $body | ConvertFrom-Json
+      if (-not $parsed.meta) { throw "Invalid content: missing meta section" }
+      $formatted = $parsed | ConvertTo-Json -Depth 20
       $outPath = Join-Path $root "content.json"
-      [System.IO.File]::WriteAllText($outPath, $body, [System.Text.UTF8Encoding]::new($false))
+      [System.IO.File]::WriteAllText($outPath, $formatted, [System.Text.UTF8Encoding]::new($false))
       Send-Json $context @{ ok = $true } 200
     } catch {
       Send-Json $context @{ error = $_.Exception.Message } 500

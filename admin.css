@@ -111,6 +111,17 @@ textarea { min-height: 5rem; resize: vertical; }
 .save-status.ok { color: #1a7f4b; }
 .save-status.err { color: #c0392b; }
 
+.server-banner {
+  font-size: 0.85rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+
+.server-banner.ok { border-color: #1a7f4b; color: #1a7f4b; }
+.server-banner.warn { border-color: #c9a227; color: #7a5f00; }
+
 .section {
   background: var(--white);
   border: 1px solid var(--border);
@@ -159,7 +170,10 @@ textarea { min-height: 5rem; resize: vertical; }
   object-fit: cover;
   margin: 0.5rem 0;
   border: 1px solid var(--border);
+  background: var(--cream);
 }
+
+.image-field .preview.preview-broken { opacity: 0.35; }
 
 .image-field .upload-row {
   display: flex;

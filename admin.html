@@ -26,18 +26,20 @@
     <header class="editor-header">
       <div>
         <h1>Site editor</h1>
-        <p>Edit content below, then save. Run via <strong>start.bat</strong> to save to disk.</p>
+        <p>Edit content below, then click <strong>Save changes</strong>. Run <strong>start.bat</strong> first.</p>
       </div>
       <div class="editor-actions">
         <a href="index.html" target="_blank" class="btn btn-ghost">View site</a>
+        <button type="button" id="btn-import" class="btn btn-ghost">Import JSON</button>
         <button type="button" id="btn-download" class="btn btn-ghost">Download JSON</button>
         <button type="button" id="btn-save" class="btn btn-dark">Save changes</button>
         <button type="button" id="btn-logout" class="btn btn-ghost">Sign out</button>
         <a href="index.html" class="btn btn-exit">Exit</a>
       </div>
     </header>
+    <p id="server-banner" class="server-banner" role="status"></p>
     <p id="save-status" class="save-status" role="status"></p>
-    <form id="content-form" class="content-form"></form>
+    <form id="content-form" class="content-form" novalidate></form>
   </div>
 
   <script src="admin.js"></script>
