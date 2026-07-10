@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "title": "Roulstone Reed Construction",
+    "description": "Roulstone Reed Construction â?" quality builds across commercial, residential, and industrial projects throughout the UK."
+  },
+  "hero": {
+    "title": "Roulstone Reed",
+    "kicker": "Construction specialists",
+    "tagline": "Quality building, delivered with care â?" from groundwork to handover.",
+    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2800&q=90"
+  },
+  "heroImage": {
+    "src": "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=2400&q=90",
+    "alt": "Modern home exterior"
+  },
+  "about": {
+    "title": "About Roulstone Reed",
+    "text": "We turn plans into buildings â?" on time, on budget, and built to last. Trusted by clients who expect skilled workmanship, clear communication, and attention to detail.",
+    "button": "Who we are"
+  },
+  "services": {
+    "kicker": "What we build",
+    "text": "Our construction services cover new builds, extensions, and refurbishments â?" delivered with skilled trades, reliable programme management, and lasting quality.",
+    "button": "Our services",
+    "items": [
+      { "title": "Commercial", "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=85" },
+      { "title": "Residential", "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85" },
+      { "title": "Industrial", "image": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=900&q=85" },
+      { "title": "Renovations", "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=85" }
+    ]
+  },
+  "showroom": {
+    "kicker": "Our approach",
+    "title": "Careful planning, precise execution, and pride in every detail.",
+    "addressLabel": "Address",
+    "address": "Serving clients across the United Kingdom",
+    "image": "https://images.unsplash.com/photo-1590644362807-5f520f4adaba?w=2400&q=90"
+  },
+  "projects": {
+    "kicker": "Featured projects",
+    "intro": "Every project reflects our commitment to craft, collaboration, and getting the details right.",
+    "button": "View projects",
+    "items": [
+      { "name": "Orchard Residence", "tags": "New Build Â· Residential Â· Extension", "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=85" },
+      { "name": "Harbour Offices", "tags": "Commercial Â· Fit-out", "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=85" },
+      { "name": "Millbrook Warehouse", "tags": "Industrial Â· Ground-Up", "image": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=85" },
+      { "name": "Lakeside Extension", "tags": "Renovation Â· Residential", "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=85" },
+      { "name": "Hillcrest Barn", "tags": "Conversion Â· Residential", "image": "https://images.unsplash.com/photo-1600566753190-17f0baa4226a?w=600&q=85" }
+    ]
+  },
+  "duo": {
+    "imageA": "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=1400&q=90",
+    "imageB": "https://images.unsplash.com/photo-1600585152915-d208bec867a1?w=1000&q=90"
+  },
+  "stories": {
+    "kicker": "Client stories",
+    "items": [
+      {
+        "quote": "We aim to deliver every project on time and on budget â?" with professional, punctual service our clients are happy to recommend.",
+        "name": "James R",
+        "role": "Co. Owner",
+        "image": "images/headshot.jpg"
+      },
+      {
+        "quote": "Clear communication at every stage. One of the best experiences we've had working with a construction team.",
+        "name": "Sarah M.",
+        "role": "Project Manager",
+        "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80"
+      },
+      {
+        "quote": "Meticulous workmanship from start to finish. We would not hesitate to recommend Roulstone Reed.",
+        "name": "David K.",
+        "role": "Architect",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Ready to start your build?",
+    "text": "Tell us about your project and we'll take it from there.",
+    "buttonPrimary": "Our services",
+    "buttonSecondary": "Get in touch",
+    "email": "info@roulstonereed.co.uk"
+  },
+  "footer": {
+    "copyright": "Â© 2026 Roulstone Reed Construction",
+    "instagramUrl": "https://www.instagram.com/roulstone.reed.construction",
+    "instagramLabel": "Instagram"
+  }
+}

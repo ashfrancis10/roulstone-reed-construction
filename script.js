@@ -1,4 +1,9 @@
-(function () {
+(async function () {
+  if (window.SiteContent) {
+    const data = await SiteContent.loadContent();
+    if (data) SiteContent.applyContent(data);
+  }
+
   const intro = document.getElementById('intro');
   const header = document.getElementById('header');
   const menu = document.getElementById('menu');

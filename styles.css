@@ -1333,11 +1333,20 @@ svg { overflow: visible; }
     transform-origin: right center;
     transition: transform 0.5s cubic-bezier(1, 0, 0, 1);
   }
-  .site-footer-links a:hover::after {
+.site-footer-links a:hover::after {
     transform: scaleX(1);
     transform-origin: left center;
   }
 }
+
+.site-edit-link {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  opacity: 0.45;
+  transition: opacity 0.3s;
+}
+
+.site-edit-link:hover { opacity: 1; }
 
 /* ── Reveals ── */
 .reveal {
