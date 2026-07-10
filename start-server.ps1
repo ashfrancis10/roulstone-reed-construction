@@ -9,12 +9,17 @@ Write-Host "Press Ctrl+C to stop."
 
 function Get-AdminConfig {
   $cfgPath = Join-Path $root "admin-config.json"
-  $default = @{ password = "password"; publishToGitHub = $true }
+  $default = @{
+    password = "password"
+    publishToGitHub = $true
+    liveSiteUrl = "https://roulstone-reed-construction.ashfrancis10.workers.dev/"
+  }
   if (Test-Path $cfgPath) {
     $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json
     return @{
       password = if ([string]$cfg.password) { $cfg.password.Trim() } else { $default.password }
       publishToGitHub = if ($null -ne $cfg.publishToGitHub) { [bool]$cfg.publishToGitHub } else { $true }
+      liveSiteUrl = if ([string]$cfg.liveSiteUrl) { $cfg.liveSiteUrl.Trim() } else { $default.liveSiteUrl }
     }
   }
   return $default
@@ -47,7 +52,7 @@ function Publish-ToGitHub {
     if ($LASTEXITCODE -ne 0) { throw "Git commit failed" }
     $push = & $git push origin main 2>&1
     if ($LASTEXITCODE -ne 0) { throw ($push -join " ") }
-    return @{ published = $true; message = "Published to GitHub" }
+    return @{ published = $true; message = "Published — live site updates in 1-2 minutes" }
   } finally {
     Pop-Location
   }
@@ -94,11 +99,13 @@ while ($listener.IsListening) {
       [System.IO.File]::WriteAllText($outPath, $formatted, [System.Text.UTF8Encoding]::new($false))
       $response = @{ ok = $true; saved = $true }
       $cfg = Get-AdminConfig
+      $response.liveSiteUrl = $cfg.liveSiteUrl
       if ($cfg.publishToGitHub) {
         try {
           $pub = Publish-ToGitHub
           $response.published = [bool]$pub.published
           $response.message = $pub.message
+          if ($pub.published) { $response.message += " " + $cfg.liveSiteUrl }
         } catch {
           $response.published = $false
           $response.publishError = $_.Exception.Message

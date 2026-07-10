@@ -1,0 +1,8 @@
+.git
+.github
+admin-config.json
+start-server.ps1
+start.bat
+push-to-github.ps1
+setup-cloudflare.ps1
+page.html

@@ -1,7 +1,7 @@
 (function () {
   const AUTH_KEY = 'rr_admin_auth';
   const DEFAULT_PASSWORD = 'password';
-  const DEFAULT_LIVE_URL = 'https://ashfrancis10.github.io/roulstone-reed-construction/';
+  const DEFAULT_LIVE_URL = 'https://roulstone-reed-construction.ashfrancis10.workers.dev/';
   let liveSiteUrl = DEFAULT_LIVE_URL;
   let content = null;
   let adminPassword = DEFAULT_PASSWORD;
@@ -264,7 +264,7 @@
   function updateServerBanner() {
     if (!serverBanner) return;
     if (serverAvailable) {
-      serverBanner.textContent = 'Server connected — Save publishes to GitHub automatically.';
+      serverBanner.textContent = 'Server connected — Save publishes to the live Cloudflare site automatically.';
       serverBanner.className = 'server-banner ok';
     } else {
       serverBanner.textContent = 'Local server not detected. Run start.bat, then refresh. You can still edit and use Download JSON.';
@@ -395,7 +395,8 @@
       if (!res.ok) throw new Error(body.error || 'Save failed');
       content = data;
       if (body.published) {
-        setStatus('Saved and published. Live site updates in 1–2 minutes: ' + liveSiteUrl, 'ok');
+        const url = body.liveSiteUrl || liveSiteUrl;
+        setStatus('Saved and published. Live site updates in 1–2 minutes: ' + url, 'ok');
       } else if (body.publishError) {
         setStatus('Saved locally. GitHub publish failed: ' + body.publishError, 'err');
       } else if (body.message) {
