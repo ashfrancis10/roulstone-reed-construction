@@ -94,9 +94,13 @@ while ($listener.IsListening) {
       $body = Read-Body $context
       $parsed = $body | ConvertFrom-Json
       if (-not $parsed.meta) { throw "Invalid content: missing meta section" }
-      $formatted = $parsed | ConvertTo-Json -Depth 20
       $outPath = Join-Path $root "content.json"
-      [System.IO.File]::WriteAllText($outPath, $formatted, [System.Text.UTF8Encoding]::new($false))
+      $utf8 = [System.Text.UTF8Encoding]::new($false)
+      if ($body -match '^\s*\{') {
+        [System.IO.File]::WriteAllText($outPath, $body.Trim(), $utf8)
+      } else {
+        [System.IO.File]::WriteAllText($outPath, ($parsed | ConvertTo-Json -Depth 20 -Compress:$false), $utf8)
+      }
       $response = @{ ok = $true; saved = $true }
       $cfg = Get-AdminConfig
       $response.liveSiteUrl = $cfg.liveSiteUrl
