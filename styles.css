@@ -13,10 +13,19 @@
   --ease-quart: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
   --font-s: calc((100vw / var(--size)) * 10);
+  --nav-offset: 3rem;
+  --nav-height: 5rem;
+  --nav-clearance: calc(var(--nav-offset) + var(--nav-height) + 2rem);
 }
 
 @media (max-width: 600px) { :root { --size: 375; } }
-@media (min-width: 601px) { :root { --size: 1600; } }
+@media (min-width: 601px) {
+  :root {
+    --size: 1600;
+    --nav-offset: 4rem;
+    --nav-clearance: calc(var(--nav-offset) + var(--nav-height) + 1rem);
+  }
+}
 
 html {
   font-size: var(--font-s);
@@ -165,24 +174,20 @@ svg { overflow: visible; }
 /* ── Header ── */
 .header {
   position: fixed;
-  bottom: 3rem;
+  bottom: calc(var(--nav-offset) + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translate3d(-50%, 0, 0);
   z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 27.6rem;
-  height: 5rem;
+  width: min(27.6rem, calc(100vw - 4rem));
+  height: var(--nav-height);
   color: var(--white);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.6s var(--ease-quart), visibility 0.6s;
   user-select: none;
-}
-
-@media (min-width: 601px) {
-  .header { bottom: 4rem; }
 }
 
 .header.visible {
@@ -262,11 +267,11 @@ svg { overflow: visible; }
 /* ── Menu ── */
 .menu {
   position: fixed;
-  bottom: 10rem;
+  bottom: calc(var(--nav-clearance) + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translate3d(-50%, 0, 0);
   z-index: 9;
-  width: 32rem;
+  width: min(32rem, calc(100vw - 4rem));
   padding: 6rem 4rem 3rem;
   color: var(--white);
   visibility: hidden;
@@ -1284,7 +1289,7 @@ svg { overflow: visible; }
 
 .site-footer-bar {
   position: absolute;
-  bottom: 4rem;
+  bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   z-index: 3;
@@ -1295,6 +1300,41 @@ svg { overflow: visible; }
   gap: 2rem;
   font-size: 1.4rem;
   color: color-mix(in srgb, var(--white) 60%, transparent);
+}
+
+@media (max-width: 600px) {
+  .site-footer-bar {
+    bottom: calc(var(--nav-clearance) + env(safe-area-inset-bottom, 0px));
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .site-footer-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    width: 100%;
+  }
+
+  .site-footer-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .site-footer-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 4.4rem;
+    padding: 0.6rem 0;
+  }
+
+  .site-footer-wordmark {
+    padding-bottom: calc(var(--nav-clearance) + 14rem);
+  }
 }
 
 .site-footer-logo {
