@@ -1,10 +1,10 @@
 {
     "meta":  {
-                 "title":  "Roulstone Reed Constructio",
+                 "title":  "Roulstone Reed Construction",
                  "description":  "Roulstone Reed Construction - quality builds across commercial, residential, and industrial projects throughout the UK."
              },
     "hero":  {
-                 "title":  "Roulstone Ree",
+                 "title":  "Roulstone Reed",
                  "kicker":  "Construction specialists",
                  "tagline":  "Quality building, delivered with care - from groundwork to handover.",
                  "image":  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2800\u0026q=90"
@@ -55,27 +55,27 @@
                      "items":  [
                                    {
                                        "name":  "Orchard Residence",
-                                       "tags":  "New Build Â· Residential Â· Extension",
+                                       "tags":  "New Build Ã‚Â· Residential Ã‚Â· Extension",
                                        "image":  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600\u0026q=85"
                                    },
                                    {
                                        "name":  "Harbour Offices",
-                                       "tags":  "Commercial Â· Fit-out",
+                                       "tags":  "Commercial Ã‚Â· Fit-out",
                                        "image":  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600\u0026q=85"
                                    },
                                    {
                                        "name":  "Millbrook Warehouse",
-                                       "tags":  "Industrial Â· Ground-Up",
+                                       "tags":  "Industrial Ã‚Â· Ground-Up",
                                        "image":  "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600\u0026q=85"
                                    },
                                    {
                                        "name":  "Lakeside Extension",
-                                       "tags":  "Renovation Â· Residential",
+                                       "tags":  "Renovation Ã‚Â· Residential",
                                        "image":  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600\u0026q=85"
                                    },
                                    {
                                        "name":  "Hillcrest Barn",
-                                       "tags":  "Conversion Â· Residential",
+                                       "tags":  "Conversion Ã‚Â· Residential",
                                        "image":  "https://images.unsplash.com/photo-1600566753190-17f0baa4226a?w=600\u0026q=85"
                                    }
                                ]
@@ -115,7 +115,7 @@
                     "email":  "info@roulstonereed.co.uk"
                 },
     "footer":  {
-                   "copyright":  "Â© 2026 Roulstone Reed Construction",
+                   "copyright":  "Ã‚Â© 2026 Roulstone Reed Construction",
                    "instagramUrl":  "https://www.instagram.com/roulstone.reed.construction",
                    "instagramLabel":  "Instagram"
                }
