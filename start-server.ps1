@@ -52,7 +52,7 @@ function Publish-ToGitHub {
     if ($LASTEXITCODE -ne 0) { throw "Git commit failed" }
     $push = & $git push origin main 2>&1
     if ($LASTEXITCODE -ne 0) { throw ($push -join " ") }
-    return @{ published = $true; message = "Published — live site updates in 1-2 minutes" }
+    return @{ published = $true; message = "Published - live site updates in 1-2 minutes" }
   } finally {
     Pop-Location
   }
