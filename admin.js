@@ -263,11 +263,16 @@
 
   function updateServerBanner() {
     if (!serverBanner) return;
+    const onLive = location.hostname.includes('workers.dev');
     if (serverAvailable) {
-      serverBanner.textContent = 'Server connected — Save publishes to the live Cloudflare site automatically.';
+      serverBanner.textContent = onLive
+        ? 'Live editor connected — Save commits to GitHub and updates this site.'
+        : 'Server connected — Save publishes to the live Cloudflare site automatically.';
       serverBanner.className = 'server-banner ok';
     } else {
-      serverBanner.textContent = 'Local server not detected. Run start.bat, then refresh. You can still edit and use Download JSON.';
+      serverBanner.textContent = onLive
+        ? 'Save API not ready. Run setup-live-editor.ps1 once, then redeploy.'
+        : 'Local server not detected. Run start.bat, then refresh. You can still edit and use Download JSON.';
       serverBanner.className = 'server-banner warn';
     }
   }
@@ -323,7 +328,7 @@
       showEditor();
       setStatus('', '');
     } catch {
-      loginError.textContent = 'Could not load content. Run start.bat, then open http://localhost:8080/admin.html';
+      loginError.textContent = 'Could not load content. Check your connection and refresh.';
       loginError.hidden = false;
       sessionStorage.removeItem(AUTH_KEY);
     }
@@ -384,7 +389,10 @@
     const data = collectFormData();
     setStatus('Saving…', '');
     if (!serverAvailable) {
-      setStatus('Start start.bat to save, or use Download JSON.', 'err');
+      const onLive = location.hostname.includes('workers.dev');
+      setStatus(onLive
+        ? 'Save API not configured. Run setup-live-editor.ps1 on your PC.'
+        : 'Start start.bat to save, or use Download JSON.', 'err');
       return;
     }
     try {
@@ -398,7 +406,7 @@
       content = data;
       if (body.published) {
         const url = body.liveSiteUrl || liveSiteUrl;
-        setStatus('Saved and published. Live site updates in 1–2 minutes: ' + url, 'ok');
+        setStatus('Saved to GitHub. Live site updates in 1-2 minutes: ' + url, 'ok');
       } else if (body.publishError) {
         setStatus('Saved locally. GitHub publish failed: ' + body.publishError, 'err');
       } else if (body.message) {
